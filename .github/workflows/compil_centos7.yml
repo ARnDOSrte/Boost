@@ -1,0 +1,78 @@
+name: Compil_Centos7_Boost
+
+on: [push]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  compilation:
+    name: Compil
+    runs-on: ubuntu-latest
+    container: 'centos:centos7'
+    steps:
+      - name: Install Dependancies
+        run: |
+          yum update -y
+          yum install -y epel-release
+          yum install -y git redhat-lsb-core make wget centos-release-scl scl-utils
+          yum install -y devtoolset-9
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1.13
+        with:
+          cmake-version: '3.22.x'
+      
+      - name: Checkout sources
+        uses: actions/checkout@v1
+
+      - name: Install boost
+        run: |  
+          source /opt/rh/devtoolset-9/enable
+          wget https://boostorg.jfrog.io/artifactory/main/release/1.73.0/source/boost_1_73_0.tar.gz
+          tar -xzvf ./boost_1_73_0.tar.gz
+          cd boost_1_73_0
+          ./bootstrap.sh --prefix=/usr/local
+          ./b2 install --without-python -j 5
+          ls
+          cd ..
+      
+      - name: Prepare zip
+        id: b2
+        run: |
+          ARCHIVE_NAME="b2.zip"
+          ARCHIVE_PATH="$PWD/${ARCHIVE_NAME}"
+          zip $ARCHIVE_PATH /__w/Boost/Boost/boost_1_73_0/b2
+          echo "::set-output name=archive_name::$ARCHIVE_NAME"
+          echo "::set-output name=archive_path::$ARCHIVE_PATH"
+  
+  publish_asset:
+    name: Publish release assets
+    needs: compilation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: b2.zip
+          path: ./
+
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.3.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.COMPIL_BOOST }}
+      
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.COMPIL_BOOST }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: b2.zip
+          asset_name: b2.zip
+          asset_content_type: application/zip
+            
+          
