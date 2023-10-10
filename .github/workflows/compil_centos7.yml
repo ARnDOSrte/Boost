@@ -39,10 +39,6 @@ jobs:
           cd ..
       
       - name: Prepare zip
-        on: 
-          push:
-            tags:
-              - '*'
         id: b2
         run: |
           ARCHIVE_NAME="b2.zip"
@@ -56,10 +52,6 @@ jobs:
           ls
       
       - name: Upload OR-Tools install artifact
-        on: 
-          push:
-            tags:
-              - '*'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.b2.outputs.archive_name }}
@@ -69,10 +61,7 @@ jobs:
     name: Publish release assets
     needs: compilation
     runs-on: ubuntu-latest
-    on: 
-      push:
-        tags:
-          - '*'
+    if: "contains(github.ref, 'tag')"
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v3
