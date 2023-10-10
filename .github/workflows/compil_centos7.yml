@@ -43,7 +43,7 @@ jobs:
         run: |
           ARCHIVE_NAME="boost_1_73_0.zip"
           ARCHIVE_PATH="$PWD/${ARCHIVE_NAME}"
-          zip $ARCHIVE_PATH /__w/Boost/Boost/boost_1_73_0
+          zip -r $ARCHIVE_PATH /__w/Boost/Boost/boost_1_73_0
           echo "::set-output name=archive_name::$ARCHIVE_NAME"
           echo "::set-output name=archive_path::$ARCHIVE_PATH"
           echo $ARCHIVE_PATH
