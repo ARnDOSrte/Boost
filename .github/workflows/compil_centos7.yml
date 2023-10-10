@@ -68,11 +68,16 @@ jobs:
           name: b2.zip
           path: ./
 
-      - name: Get release
-        id: get_release
-        uses: bruceadams/get-release@v1.3.2
+      -- name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.COMPIL_BOOST }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
       
       - name: Upload Release Asset
         id: upload-release-asset 
