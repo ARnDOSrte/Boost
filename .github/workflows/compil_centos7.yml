@@ -41,9 +41,9 @@ jobs:
       - name: Prepare zip
         id: b2
         run: |
-          ARCHIVE_NAME="b2.zip"
+          ARCHIVE_NAME="boost_1_73_0.zip"
           ARCHIVE_PATH="$PWD/${ARCHIVE_NAME}"
-          zip $ARCHIVE_PATH /__w/Boost/Boost/boost_1_73_0/b2
+          zip $ARCHIVE_PATH /__w/Boost/Boost/boost_1_73_0
           echo "::set-output name=archive_name::$ARCHIVE_NAME"
           echo "::set-output name=archive_path::$ARCHIVE_PATH"
           echo $ARCHIVE_PATH
@@ -66,7 +66,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-          name: b2.zip
+          name: boost_1_73_0.zip
           path: ./
 
       - name: Create Release
@@ -87,8 +87,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.COMPIL_BOOST }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: b2.zip
-          asset_name: b2.zip
+          asset_path: boost_1_73_0.zip
+          asset_name: boost_1_73_0.zip
           asset_content_type: application/zip
             
           
